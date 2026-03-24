@@ -63,21 +63,26 @@
     /* ── Stage extras: stock values, fuel, package includes ── */
     const stageExtras = {
       1: {
-        hp_stock: 230, hp_tuned: 275, nm_stock: 350, nm_tuned: 430,
+        hp_stock: 230, hp_tuned: 298, nm_stock: 350, nm_tuned: 438,
         fuel: 'Gasolina Extra 91', ecu: 'Bosch MG1CS011',
         includes: ['Calibración ECU personalizada','Archivo OEM de respaldo','Sesión de validación en ruta','Soporte técnico post-servicio']
       },
       2: {
-        hp_stock: 230, hp_tuned: 315, nm_stock: 350, nm_tuned: 470,
+        hp_stock: 230, hp_tuned: 325, nm_stock: 350, nm_tuned: 485,
         fuel: 'Extra + Race Gas', ecu: 'Bosch MG1CS011',
         includes: ['Downpipe 3" con cat. sport','Filtro de admisión alto flujo','Calibración ECU personalizada','Archivo OEM de respaldo']
       },
       3: {
+        hp_stock: 230, hp_tuned: 381, nm_stock: 350, nm_tuned: 551,
+        fuel: 'Race Gas Ultra Obligatorio', ecu: 'Bosch MG1CS011',
+        includes: ['Downpipe 3.5" con cat. sport','Intercooler frontal alta densidad','Admisión de alto flujo','Inyectores upgrade','Calibración ECU personalizada','Archivo OEM de respaldo']
+      },
+      4: {
         hp_stock: 400, hp_tuned: 465, nm_stock: 500, nm_tuned: 610,
         fuel: 'Gasolina Extra 91', ecu: 'Siemens Simos 18',
         includes: ['Calibración ECU + TCU','Archivo OEM de respaldo','Sesión de validación en ruta','Soporte técnico post-servicio']
       },
-      4: {
+      5: {
         hp_stock: 400, hp_tuned: 520, nm_stock: 500, nm_tuned: 680,
         fuel: 'Extra + Race Gas Ultra', ecu: 'Siemens Simos 18',
         includes: ['Downpipe 3.5" con cat. sport','Intercooler frontal alta densidad','Admisión de alto flujo','Calibración ECU + TCU']
@@ -399,6 +404,118 @@
       }, { threshold: 0.12 }).observe(section);
     }
 
+    /* ── Stage Comparison Section ── */
+    function buildStageComparison(currentStage) {
+      if (!arpData || !arpData.performance_stages) return '';
+      const siblings = arpData.performance_stages.filter(s => s.car === currentStage.car);
+      if (siblings.length < 2) return '';
+
+      const cols = siblings.map(s => {
+        const ex = stageExtras[s.id] || {};
+        const isCurrent = s.id === currentStage.id;
+        const waText = encodeURIComponent('Hola, quiero saber más sobre la reprogramación ' + s.slogan);
+        return `
+          <div class="sc-col ${isCurrent ? 'sc-col-active' : ''}">
+            ${isCurrent ? '<div class="sc-current-badge">ACTUAL</div>' : ''}
+            <div class="sc-name">${s.name}</div>
+            <div class="sc-type">${s.type}</div>
+            <div class="sc-nums">
+              <div class="sc-num-row">
+                <span class="sc-num-val ${isCurrent ? 'sc-num-red' : ''}">${ex.hp_tuned || '—'}</span>
+                <span class="sc-num-unit">HP</span>
+              </div>
+              <div class="sc-num-row">
+                <span class="sc-num-val ${isCurrent ? 'sc-num-red' : ''}">${ex.nm_tuned || '—'}</span>
+                <span class="sc-num-unit">Nm</span>
+              </div>
+            </div>
+            <div class="sc-gain-row">
+              <span class="sc-gain">${s.hp_gain}</span>
+              <span class="sc-gain">${s.torque_gain}</span>
+            </div>
+            <div class="sc-fuel">${ex.fuel || ''}</div>
+            <a href="repro-detalle.html?id=${s.id}"
+               class="sc-cta ${isCurrent ? 'sc-cta-active' : ''}"
+               ${isCurrent ? 'aria-current="page"' : ''}>
+              ${isCurrent ? 'VIENDO AHORA' : 'VER DETALLE →'}
+            </a>
+          </div>`;
+      }).join('');
+
+      return `
+      <section class="sc-section">
+        <div class="sc-header text-center">
+          <span class="proofs-eyebrow">Elige tu nivel</span>
+          <h2 class="proofs-title">COMPARATIVA <span class="proofs-accent">DE STAGES</span></h2>
+          <p class="proofs-sub">Todos los stages disponibles para tu plataforma.</p>
+        </div>
+        <div class="sc-grid">${cols}</div>
+      </section>`;
+    }
+
+    /* ── Add-ons Section ── */
+    function buildAddonsSection(stage) {
+      const waBase = 'https://wa.me/573156662073?text=';
+      const addons = [
+        {
+          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#E63946" stroke-width="1.5"/>
+            <path d="M8 12s1-3 4-3 4 3 4 3-1 3-4 3-4-3-4-3z" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="1.5" fill="#E63946"/>
+          </svg>`,
+          name: 'Pop & Bangs',
+          sub: 'Antilag / Deceleration Map',
+          desc: 'Sonido agresivo en cada desaceleración. Disparos en el escape controlados y configurables. El upgrade más llamativo para los amantes del sonido.',
+          tag: 'SONIDO',
+          wa: waBase + encodeURIComponent('Hola, me interesa el add-on Pop & Bangs para mi ' + stage.slogan)
+        },
+        {
+          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="6" width="18" height="13" rx="2" stroke="#E63946" stroke-width="1.5"/>
+            <path d="M3 10h18" stroke="#E63946" stroke-width="1.5"/>
+            <path d="M8 14h2M14 14h2" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>`,
+          name: 'Reprogramación de Caja',
+          sub: 'TCU / DSG Tune',
+          desc: 'Cambios más rápidos, puntos de cambio optimizados y mapas de par adaptados a tu Stage. Imprescindible para aprovechar el 100% de la potencia.',
+          tag: 'TRANSMISIÓN',
+          wa: waBase + encodeURIComponent('Hola, me interesa la Reprogramación de Caja DSG para mi ' + stage.slogan)
+        },
+        {
+          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
+            <circle cx="12" cy="12" r="6" stroke="#E63946" stroke-width="1.5"/>
+            <path d="M9 12a3 3 0 0 1 6 0" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>`,
+          name: 'Cat Delete / Off-Road',
+          sub: 'Catalizador eliminado',
+          desc: 'Elimina la restricción del catalizador en la ECU para un flujo de gases libre. Temperatura EGT optimizada. Para uso en pista o países sin restricciones.',
+          tag: 'ESCAPE',
+          wa: waBase + encodeURIComponent('Hola, me interesa el Cat Delete para mi ' + stage.slogan)
+        }
+      ];
+
+      const cards = addons.map(a => `
+        <div class="addon-card">
+          <div class="addon-tag">${a.tag}</div>
+          <div class="addon-icon">${a.icon}</div>
+          <h4 class="addon-name">${a.name}</h4>
+          <div class="addon-sub">${a.sub}</div>
+          <p class="addon-desc">${a.desc}</p>
+          <a href="${a.wa}" target="_blank" class="addon-cta">AGREGAR AL PAQUETE →</a>
+        </div>`).join('');
+
+      return `
+      <section class="addons-section">
+        <div class="sc-header text-center">
+          <span class="proofs-eyebrow">Lleva tu build más lejos</span>
+          <h2 class="proofs-title">OPCIONES <span class="proofs-accent">ADICIONALES</span></h2>
+          <p class="proofs-sub">Combina con tu Stage para un resultado definitivo.</p>
+        </div>
+        <div class="addons-grid">${cards}</div>
+      </section>`;
+    }
+
     /* ── Render ── */
     function renderReproDetails(stage) {
       if (!stage) {
@@ -453,8 +570,10 @@
 
       const extras = stageExtras[stage.id] || {};
       const proofsHTML = extras.hp_tuned ? buildProofsSection(stage, extras) : '';
+      const compHTML = buildStageComparison(stage);
+      const addonsHTML = buildAddonsSection(stage);
 
-      document.getElementById('repro-detail-container').innerHTML = html + proofsHTML;
+      document.getElementById('repro-detail-container').innerHTML = html + proofsHTML + compHTML + addonsHTML;
       document.getElementById('repro-detail-container').style.opacity = '0';
       setTimeout(() => {
         document.getElementById('repro-detail-container').style.transition = 'opacity 0.6s ease';

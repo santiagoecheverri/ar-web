@@ -411,51 +411,11 @@
     ════════════════════════════════════════════════ */
     function renderStageContent(stage) {
       const extras = stageExtras[stage.id] || {};
-      const waLink = `https://wa.me/573156662073?text=${encodeURIComponent('Hola, quiero agendar la reprogramación ' + stage.slogan)}`;
-
-      const summaryHTML = `
-        <section class="stage-summary">
-          <div class="container">
-            <div class="row align-items-center g-5">
-              <div class="col-md-7">
-                <div class="mb-3">
-                  <span class="stage-badge-square">${stage.name}</span>
-                  <span class="text-muted small ms-3 fw-bold text-uppercase" style="letter-spacing:1.5px">${stage.type}</span>
-                </div>
-                <p class="lead mt-3" style="color:#aaa;line-height:1.7">${stage.description}</p>
-                <div class="stage-stats-row">
-                  <div class="stage-stat-item">
-                    <span class="stage-stat-val">${stage.hp_gain}</span>
-                    <span class="stage-stat-lbl">POTENCIA</span>
-                  </div>
-                  <div class="stage-stat-item">
-                    <span class="stage-stat-val">${stage.torque_gain}</span>
-                    <span class="stage-stat-lbl">TORQUE</span>
-                  </div>
-                  ${stage.kw_gain ? `<div class="stage-stat-item">
-                    <span class="stage-stat-val">${stage.kw_gain}</span>
-                    <span class="stage-stat-lbl">KW</span>
-                  </div>` : ''}
-                </div>
-                <div class="mt-4 pt-2 d-flex gap-3 flex-wrap align-items-center">
-                  <a href="${waLink}" class="btn btn-arp btn-arp-danger px-5 py-3 fw-bold" target="_blank"
-                     style="font-size:1rem;letter-spacing:1px;">&#9889; AGENDAR CITA</a>
-                  <span class="stage-fuel-badge">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 2L4.09 12.11H11L10.1 22L20 11.89H13.1L13 2Z" fill="#E63946"/></svg>
-                    ${extras.fuel || 'Ver requisitos'}
-                  </span>
-                </div>
-                <p class="small mt-4" style="color:#444">* Resultados aproximados sujetos al estado del motor, altitud de Ibagué y calidad del combustible.</p>
-              </div>
-            </div>
-          </div>
-        </section>`;
-
       const proofsHTML = extras.hp_tuned ? buildProofsSection(stage, extras) : '';
 
       const el = document.getElementById('stage-content');
       el.style.opacity = '0';
-      el.innerHTML = summaryHTML + proofsHTML;
+      el.innerHTML = proofsHTML;
       requestAnimationFrame(() => {
         el.style.transition = 'opacity 0.4s ease';
         el.style.opacity = '1';
@@ -522,9 +482,9 @@
           </div>
         </div>
 
-        <div id="stage-content"></div>
+        ${addonsHTML}
 
-        ${addonsHTML}`;
+        <div id="stage-content"></div>`;
 
       /* Tab click events */
       document.querySelectorAll('.stage-tab').forEach(btn => {
@@ -592,66 +552,47 @@
       </section>`;
     }
 
-    /* ── Add-ons Section ── */
+    /* ── Add-ons Section (compact strips) ── */
     function buildAddonsSection(stage) {
       const waBase = 'https://wa.me/573156662073?text=';
       const addons = [
         {
-          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#E63946" stroke-width="1.5"/>
-            <path d="M8 12s1-3 4-3 4 3 4 3-1 3-4 3-4-3-4-3z" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="1.5" fill="#E63946"/>
-          </svg>`,
-          name: 'Pop & Bangs',
-          sub: 'Antilag / Deceleration Map',
-          desc: 'Sonido agresivo en cada desaceleración. Disparos en el escape controlados y configurables. El upgrade más llamativo para los amantes del sonido.',
-          tag: 'SONIDO',
+          icon: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z" stroke="#E63946" stroke-width="1.5"/><path d="M8 12s1-3 4-3 4 3 4 3-1 3-4 3-4-3-4-3z" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="1.5" fill="#E63946"/></svg>`,
+          name: 'Pop & Bangs', sub: 'Antilag / Deceleration Map', tag: 'SONIDO',
           wa: waBase + encodeURIComponent('Hola, me interesa el add-on Pop & Bangs para mi ' + stage.slogan)
         },
         {
-          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <rect x="3" y="6" width="18" height="13" rx="2" stroke="#E63946" stroke-width="1.5"/>
-            <path d="M3 10h18" stroke="#E63946" stroke-width="1.5"/>
-            <path d="M8 14h2M14 14h2" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>`,
-          name: 'Reprogramación de Caja',
-          sub: 'TCU / DSG Tune',
-          desc: 'Cambios más rápidos, puntos de cambio optimizados y mapas de par adaptados a tu Stage. Imprescindible para aprovechar el 100% de la potencia.',
-          tag: 'TRANSMISIÓN',
+          icon: `<svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="18" height="13" rx="2" stroke="#E63946" stroke-width="1.5"/><path d="M3 10h18" stroke="#E63946" stroke-width="1.5"/><path d="M8 14h2M14 14h2" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+          name: 'Repro de Caja', sub: 'TCU / DSG Tune', tag: 'TRANSMISIÓN',
           wa: waBase + encodeURIComponent('Hola, me interesa la Reprogramación de Caja DSG para mi ' + stage.slogan)
         },
         {
-          icon: `<svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="12" cy="12" r="6" stroke="#E63946" stroke-width="1.5"/>
-            <path d="M9 12a3 3 0 0 1 6 0" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>`,
-          name: 'Cat Delete / Off-Road',
-          sub: 'Catalizador eliminado',
-          desc: 'Elimina la restricción del catalizador en la ECU para un flujo de gases libre. Temperatura EGT optimizada. Para uso en pista o países sin restricciones.',
-          tag: 'ESCAPE',
+          icon: `<svg viewBox="0 0 24 24" fill="none"><path d="M12 3v3M12 18v3M3 12h3M18 12h3" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/><circle cx="12" cy="12" r="6" stroke="#E63946" stroke-width="1.5"/><path d="M9 12a3 3 0 0 1 6 0" stroke="#E63946" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+          name: 'Cat Delete', sub: 'Off-Road / Track Only', tag: 'ESCAPE',
           wa: waBase + encodeURIComponent('Hola, me interesa el Cat Delete para mi ' + stage.slogan)
         }
       ];
 
-      const cards = addons.map(a => `
-        <div class="addon-card">
-          <div class="addon-tag">${a.tag}</div>
-          <div class="addon-icon">${a.icon}</div>
-          <h4 class="addon-name">${a.name}</h4>
-          <div class="addon-sub">${a.sub}</div>
-          <p class="addon-desc">${a.desc}</p>
-          <a href="${a.wa}" target="_blank" class="addon-cta">AGREGAR AL PAQUETE →</a>
-        </div>`).join('');
+      const chips = addons.map(a => `
+        <a href="${a.wa}" target="_blank" class="addon-chip">
+          <span class="addon-chip-tag">${a.tag}</span>
+          <span class="addon-chip-icon">${a.icon}</span>
+          <span class="addon-chip-body">
+            <span class="addon-chip-name">${a.name}</span>
+            <span class="addon-chip-sub">${a.sub}</span>
+          </span>
+          <span class="addon-chip-cta">AGREGAR &#8594;</span>
+        </a>`).join('');
 
       return `
-      <section class="addons-section">
-        <div class="sc-header text-center">
-          <span class="proofs-eyebrow">Lleva tu build más lejos</span>
-          <h2 class="proofs-title">OPCIONES <span class="proofs-accent">ADICIONALES</span></h2>
-          <p class="proofs-sub">Combina con tu Stage para un resultado definitivo.</p>
+      <section class="addons-section-compact">
+        <div class="container">
+          <div class="addons-compact-head">
+            <span class="addons-compact-eyebrow">&#9889; LLEVA TU BUILD MÁS LEJOS</span>
+            <span class="addons-compact-title">Opciones <span class="proofs-accent">Adicionales</span></span>
+          </div>
+          <div class="addons-chips-col">${chips}</div>
         </div>
-        <div class="addons-grid">${cards}</div>
       </section>`;
     }
 

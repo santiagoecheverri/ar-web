@@ -1317,125 +1317,147 @@ textarea.form-arp {
     cursor: default;
 }
 
-/* ── ADD-ONS SECTION ── */
-.addons-section {
-    padding: 60px 0 80px;
-    position: relative;
+/* ── ADD-ONS COMPACT STRIPS ── */
+.addons-section-compact {
+    padding: 32px 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    background: rgba(10,10,12,0.7);
 }
 
-.addons-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 20px;
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 16px;
+.addons-compact-head {
+    display: flex;
+    align-items: baseline;
+    gap: 16px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
 }
 
-.addon-card {
-    background: rgba(14, 14, 16, 0.95);
-    border: 1px solid rgba(255,255,255,0.07);
-    border-radius: 18px;
-    padding: 32px 24px 28px;
+.addons-compact-eyebrow {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 2.5px;
+    color: var(--accent-red);
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.addons-compact-title {
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -0.3px;
+}
+
+.addons-chips-col {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.addon-chip {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 18px;
+    background: rgba(18,18,20,0.9);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 12px;
+    text-decoration: none;
+    transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
     position: relative;
     overflow: hidden;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
-.addon-card::before {
+.addon-chip::before {
     content: '';
     position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: linear-gradient(90deg, transparent, rgba(230,57,70,0.6), transparent);
+    left: 0; top: 0; bottom: 0;
+    width: 3px;
+    background: var(--accent-red);
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity 0.2s ease;
 }
 
-.addon-card:hover {
-    transform: translateY(-5px);
-    border-color: rgba(230,57,70,0.3);
-    box-shadow: 0 12px 40px rgba(0,0,0,0.5), 0 0 20px rgba(230,57,70,0.08);
+.addon-chip:hover {
+    border-color: rgba(230,57,70,0.35);
+    background: rgba(230,57,70,0.05);
+    transform: translateX(3px);
 }
 
-.addon-card:hover::before {
-    opacity: 1;
-}
+.addon-chip:hover::before { opacity: 1; }
 
-.addon-tag {
-    font-size: 0.6rem;
+.addon-chip-tag {
+    font-size: 0.58rem;
     font-weight: 800;
-    letter-spacing: 2px;
+    letter-spacing: 1.5px;
     color: var(--accent-red);
-    text-transform: uppercase;
     background: rgba(230,57,70,0.1);
     border: 1px solid rgba(230,57,70,0.2);
     border-radius: 4px;
-    padding: 2px 8px;
-    display: inline-block;
-    width: fit-content;
+    padding: 2px 7px;
+    text-transform: uppercase;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: center;
 }
 
-.addon-icon {
-    width: 44px;
-    height: 44px;
+.addon-chip-icon {
+    width: 36px;
+    height: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(230,57,70,0.07);
-    border-radius: 12px;
-    margin: 4px 0;
+    background: rgba(230,57,70,0.06);
+    border-radius: 9px;
+    flex-shrink: 0;
 }
 
-.addon-icon svg {
-    width: 24px;
-    height: 24px;
+.addon-chip-icon svg {
+    width: 20px;
+    height: 20px;
 }
 
-.addon-name {
-    font-size: 1.15rem;
+.addon-chip-body {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.addon-chip-name {
+    font-size: 0.9rem;
     font-weight: 800;
-    color: #fff;
-    margin: 0;
-    letter-spacing: 0.3px;
+    color: #e0e0e0;
+    letter-spacing: 0.2px;
 }
 
-.addon-sub {
-    font-size: 0.72rem;
-    font-weight: 700;
-    color: var(--text-muted);
-    text-transform: uppercase;
+.addon-chip-sub {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #555;
+    letter-spacing: 0.5px;
+}
+
+.addon-chip-cta {
+    font-size: 0.65rem;
+    font-weight: 800;
     letter-spacing: 1.5px;
-}
-
-.addon-desc {
-    font-size: 0.88rem;
-    color: #888;
-    line-height: 1.6;
-    margin: 4px 0 0;
-}
-
-.addon-cta {
-    display: inline-block;
-    margin-top: auto;
-    padding: 11px 20px;
-    background: rgba(230,57,70,0.1);
-    border: 1px solid rgba(230,57,70,0.35);
-    border-radius: 8px;
     color: var(--accent-red);
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 1.5px;
-    text-decoration: none;
-    text-align: center;
-    transition: all 0.2s ease;
+    white-space: nowrap;
+    padding: 6px 12px;
+    border: 1px solid rgba(230,57,70,0.25);
+    border-radius: 6px;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.addon-cta:hover {
+.addon-chip:hover .addon-chip-cta {
     background: var(--accent-red);
     color: #fff;
-    box-shadow: 0 4px 20px rgba(230,57,70,0.35);
+    border-color: var(--accent-red);
+}
+
+@media (max-width: 576px) {
+    .addon-chip-cta { display: none; }
+    .addon-chip-tag { min-width: 60px; font-size: 0.5rem; }
 }

@@ -60,7 +60,9 @@
   <script src="data.js"></script>
 
   <script>
-    /* ── Stage extras: stock values, fuel, package includes ── */
+    /* ════════════════════════════════════════════════
+       STAGE EXTRAS  –  stock / tuned values, ECU, fuel
+    ════════════════════════════════════════════════ */
     const stageExtras = {
       1: {
         hp_stock: 230, hp_tuned: 298, nm_stock: 350, nm_tuned: 438,
@@ -404,7 +406,144 @@
       }, { threshold: 0.12 }).observe(section);
     }
 
-    /* ── Stage Comparison Section ── */
+    /* ════════════════════════════════════════════════
+       STAGE CONTENT RENDERER  –  updates on tab click
+    ════════════════════════════════════════════════ */
+    function renderStageContent(stage) {
+      const extras = stageExtras[stage.id] || {};
+      const waLink = `https://wa.me/573156662073?text=${encodeURIComponent('Hola, quiero agendar la reprogramación ' + stage.slogan)}`;
+
+      const summaryHTML = `
+        <section class="stage-summary">
+          <div class="container">
+            <div class="row align-items-center g-5">
+              <div class="col-md-7">
+                <div class="mb-3">
+                  <span class="stage-badge-square">${stage.name}</span>
+                  <span class="text-muted small ms-3 fw-bold text-uppercase" style="letter-spacing:1.5px">${stage.type}</span>
+                </div>
+                <p class="lead mt-3" style="color:#aaa;line-height:1.7">${stage.description}</p>
+                <div class="stage-stats-row">
+                  <div class="stage-stat-item">
+                    <span class="stage-stat-val">${stage.hp_gain}</span>
+                    <span class="stage-stat-lbl">POTENCIA</span>
+                  </div>
+                  <div class="stage-stat-item">
+                    <span class="stage-stat-val">${stage.torque_gain}</span>
+                    <span class="stage-stat-lbl">TORQUE</span>
+                  </div>
+                  ${stage.kw_gain ? `<div class="stage-stat-item">
+                    <span class="stage-stat-val">${stage.kw_gain}</span>
+                    <span class="stage-stat-lbl">KW</span>
+                  </div>` : ''}
+                </div>
+                <div class="mt-4 pt-2 d-flex gap-3 flex-wrap align-items-center">
+                  <a href="${waLink}" class="btn btn-arp btn-arp-danger px-5 py-3 fw-bold" target="_blank"
+                     style="font-size:1rem;letter-spacing:1px;">&#9889; AGENDAR CITA</a>
+                  <span class="stage-fuel-badge">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M13 2L4.09 12.11H11L10.1 22L20 11.89H13.1L13 2Z" fill="#E63946"/></svg>
+                    ${extras.fuel || 'Ver requisitos'}
+                  </span>
+                </div>
+                <p class="small mt-4" style="color:#444">* Resultados aproximados sujetos al estado del motor, altitud de Ibagué y calidad del combustible.</p>
+              </div>
+            </div>
+          </div>
+        </section>`;
+
+      const proofsHTML = extras.hp_tuned ? buildProofsSection(stage, extras) : '';
+
+      const el = document.getElementById('stage-content');
+      el.style.opacity = '0';
+      el.innerHTML = summaryHTML + proofsHTML;
+      requestAnimationFrame(() => {
+        el.style.transition = 'opacity 0.4s ease';
+        el.style.opacity = '1';
+        initProofsAnimations();
+      });
+    }
+
+    /* ════════════════════════════════════════════════
+       CAR PAGE RENDERER  –  hero + tabs + content
+    ════════════════════════════════════════════════ */
+    function renderCarPage(carKey, defaultId) {
+      const stages = (arpData.performance_stages || []).filter(s => s.car === carKey);
+      if (!stages.length) {
+        document.getElementById('repro-detail-container').innerHTML =
+          `<h2 class="text-white text-center py-5">Plataforma no encontrada</h2>
+           <div class="text-center"><a href="repros.html" class="btn btn-arp btn-arp-outline">Volver al Catálogo</a></div>`;
+        return;
+      }
+
+      const carNames = { mk7: 'Golf GTI MK7 / MK7.5', rs3: 'Audi RS3 8Y' };
+      const carName = carNames[carKey] || carKey.toUpperCase();
+      const maxHP = Math.max(...stages.map(s => (stageExtras[s.id] || {}).hp_tuned || 0));
+      document.title = `AR Performance | ${carName}`;
+
+      const tabsHTML = stages.map((s, i) => {
+        const ex = stageExtras[s.id] || {};
+        const isActive = defaultId ? s.id === defaultId : i === 0;
+        return `<button class="stage-tab ${isActive ? 'stage-tab-active' : ''}" data-id="${s.id}">
+          <div class="st-inner">
+            <span class="st-name">${s.name}</span>
+            <div class="st-hp-wrap">
+              <span class="st-hp">${ex.hp_tuned || '?'}</span>
+              <span class="st-hp-unit">HP</span>
+            </div>
+            <span class="st-gain">${s.hp_gain}</span>
+          </div>
+        </button>`;
+      }).join('');
+
+      const carImg = stages[0].image;
+      const addonsHTML = buildAddonsSection(stages[0]);
+
+      document.getElementById('repro-detail-container').innerHTML = `
+        <div class="car-hero">
+          <div class="container">
+            <a href="repros.html" class="back-link">&#8592; VOLVER AL CATÁLOGO</a>
+            <div class="car-hero-inner">
+              <div class="car-hero-text">
+                <span class="proofs-eyebrow">VAG Specialist · Ibagué, Colombia</span>
+                <h1 class="car-hero-title">${carName}</h1>
+                <p class="car-hero-sub">${stages.length} stages disponibles &nbsp;·&nbsp; Hasta <strong style="color:#fff">${maxHP} HP</strong></p>
+              </div>
+              <div class="car-hero-img-wrap">
+                <div class="car-hero-glow"></div>
+                <img src="${carImg}" alt="${carName}" class="car-hero-img">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stage-tabs-section">
+          <div class="container">
+            <div class="stage-tabs-row">${tabsHTML}</div>
+          </div>
+        </div>
+
+        <div id="stage-content"></div>
+
+        ${addonsHTML}`;
+
+      /* Tab click events */
+      document.querySelectorAll('.stage-tab').forEach(btn => {
+        btn.addEventListener('click', () => {
+          document.querySelectorAll('.stage-tab').forEach(b => b.classList.remove('stage-tab-active'));
+          btn.classList.add('stage-tab-active');
+          const stage = stages.find(s => s.id === parseInt(btn.dataset.id));
+          renderStageContent(stage);
+        });
+      });
+
+      /* Render default stage */
+      const defaultStage = defaultId
+        ? (stages.find(s => s.id === defaultId) || stages[0])
+        : stages[0];
+      renderStageContent(defaultStage);
+    }
+
+    /* ── Kept for reference: old buildStageComparison no longer needed ── */
     function buildStageComparison(currentStage) {
       if (!arpData || !arpData.performance_stages) return '';
       const siblings = arpData.performance_stages.filter(s => s.car === currentStage.car);
@@ -516,81 +655,35 @@
       </section>`;
     }
 
-    /* ── Render ── */
-    function renderReproDetails(stage) {
-      if (!stage) {
+    /* ════════════════════════════════════════════════
+       ENTRY POINT
+    ════════════════════════════════════════════════ */
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof arpData === 'undefined') {
         document.getElementById('repro-detail-container').innerHTML =
-          `<h2 class="text-white text-center py-5">Reprogramación no encontrada</h2>
-           <div class="text-center"><a href="repros.html" class="btn btn-arp btn-arp-outline">Volver al Catálogo</a></div>`;
+          `<div class="alert alert-danger m-4">Error: Datos no disponibles. <a href="repros.html">Volver al catálogo</a></div>`;
         return;
       }
-      document.title = `AR Performance | ${stage.name}`;
 
-      const html = `
-        <div class="row align-items-center">
-          <div class="col-md-6 mb-4 mb-md-0">
-            <a href="repros.html" class="text-muted text-decoration-none small fw-bold mb-3 d-inline-block" style="letter-spacing: 1px;">&larr; VOLVER AL CATÁLOGO</a>
-            <div class="mb-3">
-              <span class="stage-badge-square">${stage.name}</span>
-              <span class="text-muted small ms-3 fw-bold text-uppercase">${stage.type}</span>
-            </div>
-            <h1 class="display-4 fw-bold text-white mb-3" style="letter-spacing: -1px;">${stage.slogan}</h1>
-            <p class="lead" style="color: #999;">${stage.description}</p>
-            <div class="card card-arp p-4 mt-4" style="background: rgba(10,10,12,0.8); border: 1px solid rgba(230,57,70,0.3);">
-              <h4 class="text-white fw-bold mb-4 border-bottom border-dark pb-3">ESTADÍSTICAS PROYECTADAS</h4>
-              <div class="row text-center mb-4">
-                <div class="col-6">
-                  <h2 class="display-5 fw-bold" style="color: var(--accent-red); margin-bottom: 0;">${stage.hp_gain}</h2>
-                  <small class="text-secondary fw-bold text-uppercase" style="letter-spacing: 2px;">Potencia Adicional</small>
-                </div>
-                <div class="col-6" style="border-left: 1px solid #222;">
-                  <h2 class="display-5 fw-bold" style="color: var(--accent-red); margin-bottom: 0;">${stage.torque_gain}</h2>
-                  <small class="text-secondary fw-bold text-uppercase" style="letter-spacing: 2px;">Torque Adicional</small>
-                </div>
-              </div>
-              <div class="mt-4 pt-3 border-top border-dark">
-                <p class="small text-muted mb-0">Resultados aproximados. Sujetos a la salud del motor, altitud de Ibagué y calidad del combustible utilizado.</p>
-              </div>
-            </div>
-            <div class="mt-5">
-              <a href="https://wa.me/573156662073?text=Hola,%20me%20interesa%20la%20reprogramación%20${encodeURIComponent(stage.slogan)}"
-                 class="btn btn-arp btn-arp-danger px-5 py-3 me-3 fw-bold" target="_blank"
-                 style="font-size: 1.1rem; letter-spacing: 1px;">AGENDAR CITA</a>
-            </div>
-          </div>
-          <div class="col-md-6 mt-5 mt-md-0">
-            <div class="position-relative">
-              <div class="position-absolute top-50 start-50 translate-middle"
-                   style="width:80%;height:80%;background:radial-gradient(circle,rgba(230,57,70,0.2) 0%,rgba(15,15,17,0) 70%);z-index:0;"></div>
-              <img src="${stage.image}" alt="${stage.name}" class="img-fluid position-relative w-100"
-                   style="z-index:1;filter:drop-shadow(0 20px 30px rgba(0,0,0,0.8));">
-            </div>
-          </div>
-        </div>`;
+      const params = new URLSearchParams(window.location.search);
+      let carKey = params.get('car');
+      let defaultId = null;
 
-      const extras = stageExtras[stage.id] || {};
-      const proofsHTML = extras.hp_tuned ? buildProofsSection(stage, extras) : '';
-      const compHTML = buildStageComparison(stage);
-      const addonsHTML = buildAddonsSection(stage);
+      /* Backwards compat: ?id=2 → detect car */
+      if (!carKey) {
+        const reproId = parseInt(params.get('id'));
+        if (!isNaN(reproId)) {
+          const found = arpData.performance_stages.find(s => s.id === reproId);
+          if (found) { carKey = found.car; defaultId = found.id; }
+        }
+      }
 
-      document.getElementById('repro-detail-container').innerHTML = html + proofsHTML + compHTML + addonsHTML;
-      document.getElementById('repro-detail-container').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('repro-detail-container').style.transition = 'opacity 0.6s ease';
-        document.getElementById('repro-detail-container').style.opacity = '1';
-        initProofsAnimations();
-      }, 50);
-    }
-
-    document.addEventListener("DOMContentLoaded", () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const reproId = parseInt(urlParams.get('id'));
-      if (typeof arpData !== 'undefined' && arpData.performance_stages) {
-        const stageData = arpData.performance_stages.find(s => s.id === reproId);
-        renderReproDetails(stageData);
+      if (carKey) {
+        renderCarPage(carKey, defaultId);
       } else {
         document.getElementById('repro-detail-container').innerHTML =
-          `<div class="alert alert-danger">Error: Datos de reprogramación no disponibles. Intenta volviendo al catálogo.</div>`;
+          `<h2 class="text-white text-center py-5">Selecciona una plataforma</h2>
+           <div class="text-center"><a href="repros.html" class="btn btn-arp btn-arp-outline">Ver Catálogo</a></div>`;
       }
     });
   </script>

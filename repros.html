@@ -121,81 +121,63 @@
       const container = document.getElementById('catalog-container');
       const allStages = typeof arpData !== 'undefined' ? (arpData.performance_stages || []) : [];
 
-      // Filter Logic
-      function renderRepros(filterType = 'All') {
-        container.innerHTML = '';
-        const filtered = filterType === 'All'
-          ? allStages
-          : allStages.filter(s => s.type === filterType);
+      /* Group stages by car key → one card per platform */
+      const carMeta = {
+        mk7: { name: 'Golf GTI MK7 / MK7.5', desc: 'El clásico moderno del tuning VAG. Stage 1 al 3 disponibles, desde software puro hasta build completo de competición.' },
+        rs3: { name: 'Audi RS3 8Y',           desc: 'El sedán de alto rendimiento con motor 2.5 TFSI de cinco cilindros. Potencial brutal con la calibración correcta.' }
+      };
 
-        if (filtered.length === 0) {
-          container.innerHTML = '<p class="text-secondary text-center w-100">No hay reprogramaciones de este tipo en catálogo.</p>';
-        }
+      const cars = {};
+      allStages.forEach(s => { if (!cars[s.car]) cars[s.car] = []; cars[s.car].push(s); });
 
-        filtered.forEach((stage, index) => {
-          const activeClass = stage.is_best_seller ? 'card-arp-active' : '';
-          const btnClass = stage.is_best_seller ? 'btn-arp-danger' : 'btn-arp-outline';
-          const delay = index * 0.1; // Staggered animation
+      Object.entries(cars).forEach(([carKey, stages], index) => {
+        const meta   = carMeta[carKey] || { name: carKey.toUpperCase(), desc: '' };
+        const hasBestSeller = stages.some(s => s.is_best_seller);
+        const activeClass   = hasBestSeller ? 'card-arp-active' : '';
+        const btnClass      = hasBestSeller ? 'btn-arp-danger'  : 'btn-arp-outline';
+        const delay         = index * 0.12;
 
-          const cardHTML = `
-                        <div class="col-md-6 col-lg-6 fade-in" style="transition-delay: ${delay}s">
-                            <a href="repro-detalle.html?id=${stage.id}" class="text-decoration-none">
-                              <div class="card card-arp h-100 ${activeClass}">
-                                  <img src="${stage.image}" 
-                                       class="card-img-top img-performance" 
-                                       alt="${stage.name}"
-                                       onerror="this.src='https://via.placeholder.com/500x300/111/444?text=AR+Performance'">
-                                  
-                                  <div class="p-4">
-                                      <div class="d-flex justify-content-between align-items-center mb-3">
-                                          <span class="stage-badge-square">${stage.name.replace('RS3', '').trim()}</span>
-                                          <span class="text-muted small" style="font-size: 0.75rem;">${stage.type}</span>
-                                      </div>
-                                      <h3 class="h4 fw-bold text-white mb-2" style="letter-spacing:-0.5px">${stage.slogan}</h3>
-                                      <p class="text-muted small mb-0" style="line-height: 1.5; color: #888 !important; min-height: 45px">${stage.description}</p>
-                                      
-                                      <div class="stats-grid mb-4">
-                                          <div>
-                                              <span class="stat-val text-white">${stage.hp_gain}</span>
-                                              <span class="stat-label">POTENCIA</span>
-                                          </div>
-                                          <div>
-                                              <span class="stat-val text-white">${stage.torque_gain}</span>
-                                              <span class="stat-label">TORQUE</span>
-                                          </div>
-                                      </div>
-                                      <span class="btn ${btnClass} w-100 btn-arp mt-2">VER DETALLES</span>
-                                  </div>
-                              </div>
-                            </a>
-                        </div>
-                    `;
-          container.innerHTML += cardHTML;
-        });
+        /* Max HP from stageExtras (tuned) or fallback to gain string */
+        const maxHPArr = stages.map(s => parseInt((s.hp_gain || '').replace(/[^0-9]/g, '')) || 0);
+        const totalGain = Math.max(...maxHPArr);
 
-        // Observe new cards
-        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-      }
+        const stagePills = stages.map(s =>
+          `<span class="car-stage-pill">${s.name.replace(/RS3/i,'').trim()}</span>`
+        ).join('');
 
-      // Initial Render
-      renderRepros('All');
-
-      // Filter Listeners
-      document.querySelectorAll('.filter-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-          // UI switch
-          document.querySelectorAll('.filter-btn').forEach(b => {
-            b.classList.remove('btn-arp-danger');
-            b.classList.add('btn-arp-outline');
-          });
-          e.target.classList.remove('btn-arp-outline');
-          e.target.classList.add('btn-arp-danger');
-
-          // Logic trigger
-          const type = e.target.getAttribute('data-filter');
-          renderRepros(type);
-        });
+        const cardHTML = `
+          <div class="col-md-6 fade-in" style="transition-delay: ${delay}s">
+            <a href="repro-detalle.html?car=${carKey}" class="text-decoration-none">
+              <div class="card card-arp h-100 ${activeClass}">
+                <div class="car-card-img-wrap">
+                  <img src="${stages[0].image}" class="card-img-top img-performance"
+                       alt="${meta.name}"
+                       onerror="this.src='https://via.placeholder.com/500x300/111/444?text=AR+Performance'">
+                  ${hasBestSeller ? '<div class="car-card-hot-badge">BEST SELLER</div>' : ''}
+                </div>
+                <div class="p-4">
+                  <div class="d-flex gap-2 flex-wrap mb-3">${stagePills}</div>
+                  <h3 class="h4 fw-bold text-white mb-2" style="letter-spacing:-0.5px">${meta.name}</h3>
+                  <p class="text-muted small mb-0" style="line-height:1.6;color:#888!important;min-height:48px">${meta.desc}</p>
+                  <div class="stats-grid mb-4">
+                    <div>
+                      <span class="stat-val text-white">+${totalGain} HP</span>
+                      <span class="stat-label">MÁX. GANANCIA</span>
+                    </div>
+                    <div>
+                      <span class="stat-val text-white">${stages.length}</span>
+                      <span class="stat-label">STAGES</span>
+                    </div>
+                  </div>
+                  <span class="btn ${btnClass} w-100 btn-arp mt-2">VER STAGES &#8594;</span>
+                </div>
+              </div>
+            </a>
+          </div>`;
+        container.innerHTML += cardHTML;
       });
+
+      document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
 
     } catch (error) {
       console.error('Error cargando ARP Data:', error);

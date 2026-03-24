@@ -920,6 +920,240 @@ textarea.form-arp {
     min-height: 140px;
 }
 
+/* ── CAR STAGE PILLS (repros.html cards) ── */
+.car-stage-pill {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 1.5px;
+    color: var(--accent-red);
+    background: rgba(230,57,70,0.1);
+    border: 1px solid rgba(230,57,70,0.25);
+    border-radius: 5px;
+    padding: 2px 9px;
+    text-transform: uppercase;
+}
+
+.car-card-img-wrap { position: relative; overflow: hidden; }
+
+.car-card-hot-badge {
+    position: absolute;
+    top: 12px; right: 12px;
+    background: var(--accent-red);
+    color: #fff;
+    font-size: 0.6rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 5px;
+}
+
+/* ── CAR HERO (repro-detalle.html) ── */
+.car-hero {
+    padding: 52px 0 44px;
+    background: linear-gradient(180deg, rgba(230,57,70,0.05) 0%, transparent 100%);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.back-link {
+    display: inline-block;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    margin-bottom: 28px;
+    transition: color 0.2s ease;
+}
+.back-link:hover { color: #fff; }
+
+.car-hero-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.car-hero-text { flex: 1; }
+
+.car-hero-title {
+    font-size: clamp(2rem, 5vw, 3.4rem);
+    font-weight: 900;
+    color: #fff;
+    letter-spacing: -1.5px;
+    margin: 10px 0 8px;
+    line-height: 1.1;
+}
+
+.car-hero-sub {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin: 0;
+}
+
+.car-hero-img-wrap {
+    position: relative;
+    flex: 0 0 48%;
+    max-width: 460px;
+}
+
+.car-hero-glow {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 85%; height: 85%;
+    background: radial-gradient(circle, rgba(230,57,70,0.18) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.car-hero-img {
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.8));
+}
+
+@media (max-width: 767px) {
+    .car-hero-inner { flex-direction: column-reverse; gap: 20px; }
+    .car-hero-img-wrap { flex: none; max-width: 100%; }
+}
+
+/* ── STAGE TABS ── */
+.stage-tabs-section {
+    background: rgba(6,6,8,0.9);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    position: sticky;
+    top: 57px;
+    z-index: 50;
+}
+
+.stage-tabs-row {
+    display: flex;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+.stage-tabs-row::-webkit-scrollbar { display: none; }
+
+.stage-tab {
+    flex: 1;
+    min-width: 110px;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid transparent;
+    padding: 18px 12px 16px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+    text-align: center;
+}
+.stage-tab:hover { background: rgba(255,255,255,0.03); }
+
+.stage-tab-active {
+    border-bottom-color: var(--accent-red) !important;
+    background: rgba(230,57,70,0.05) !important;
+}
+
+.st-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+}
+
+.st-name {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #666;
+    transition: color 0.2s ease;
+}
+.stage-tab-active .st-name,
+.stage-tab:hover .st-name { color: #ccc; }
+
+.st-hp-wrap {
+    display: flex;
+    align-items: baseline;
+    gap: 3px;
+    line-height: 1;
+}
+
+.st-hp {
+    font-size: 1.55rem;
+    font-weight: 900;
+    color: #aaa;
+    letter-spacing: -1px;
+    transition: color 0.2s ease;
+}
+.stage-tab-active .st-hp { color: var(--accent-red); }
+
+.st-hp-unit {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #444;
+}
+
+.st-gain {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #4caf6e;
+    background: rgba(76,175,80,0.1);
+    border: 1px solid rgba(76,175,80,0.2);
+    border-radius: 4px;
+    padding: 1px 7px;
+    letter-spacing: 0.3px;
+}
+
+/* ── STAGE SUMMARY (inside #stage-content) ── */
+.stage-summary {
+    padding: 52px 0 44px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.stage-stats-row {
+    display: flex;
+    gap: 36px;
+    margin: 28px 0 32px;
+    flex-wrap: wrap;
+}
+
+.stage-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stage-stat-val {
+    font-size: 1.8rem;
+    font-weight: 900;
+    color: var(--accent-red);
+    letter-spacing: -0.5px;
+    line-height: 1;
+}
+
+.stage-stat-lbl {
+    font-size: 0.62rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+}
+
+.stage-fuel-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #888;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 6px;
+    padding: 8px 14px;
+}
+
 /* ── STAGE COMPARISON ── */
 .sc-section {
     padding: 80px 0 60px;
